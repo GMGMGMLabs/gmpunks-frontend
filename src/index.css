@@ -61,7 +61,6 @@ code {
   width: 340px !important;
   height: 70px;
   max-width: 340px;
-  display: flex;
   position: relative;
   flex-wrap: wrap;
   opacity: 1 !important;
@@ -106,6 +105,10 @@ input[type=number] {
   display: inline;
   width: 50px;
   height: 50px;
+}
+
+.notification-alert {
+  border: 1px solid rgb(230, 55, 119) !important;
 }
 
 .notification-bar {

@@ -28,7 +28,6 @@ class App extends Component {
 
   notify(msg) {
     let key = parseInt(Math.random()*10000);
-    console.log(key);
     this.state.notifications.push(<Notification key={key} msg={msg} onClose={()=>this.removeNotification(key)}></Notification>);
     this.setState({
       notifications: this.state.notifications
@@ -53,15 +52,15 @@ class App extends Component {
       const networkId = await web3.eth.net.getId();
       const contract = new web3.eth.Contract(
         ProxyAbi,
-        80001 && "0xC878aB397cAf8468FCEa7eEAf8129dD7A1bB5DC3",
+        137 && "0x162FF06EE16a9f8163aF96beF1aD72EC13556839",
       );
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      if (networkId == 80001) {
+      if (networkId == 137) {
         this.setState({ web3, accounts, contract: contract });
       } else {
-        this.notify("Please switch to POLYGON network");
+        this.notify("Please switch to MATIC network");
       }
     } catch (error) {
       this.notify("Couldn't connect to wallet")
@@ -92,7 +91,7 @@ class App extends Component {
             </Container>
           </Navbar>
         
-          <div  className="notification-bar">{this.state.notifications._store}</div>
+          <div className="notification-bar">{this.state.notifications._store}</div>
           <br/>
             <AppContext.Provider value={{ web3: this.state.web3, accounts: this.state.accounts, contract: this.state.contract, notify: this.notify }}>
               <Mint></Mint>

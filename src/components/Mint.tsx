@@ -7,7 +7,7 @@ interface MintProps { }
 
 class Mint extends Component<MintProps> {
 
-  state = { canMint: false, numMint: 1 };
+  state = { canMint: false, numMint: 1, walletConnected: false };
 
   constructor(props: MintProps) {
     super(props);
@@ -22,13 +22,10 @@ class Mint extends Component<MintProps> {
     contractPromise.then((data: any) => {
       console.log(data);
       this.setState({
-        canMint: data
+        canMint: data,
+        walletConnected: true
       });
     });
-  }
-
-  componentDidMount() {
-    //this.updateMessage();
   }
 
   buyInputChange(event: any){
@@ -47,8 +44,10 @@ class Mint extends Component<MintProps> {
     });
   }
 
-  buy() {
-    if (this.state.canMint) {
+  async buy() {
+    let networkId = await this.context.web3.eth.net.getId();
+    console.log(networkId);
+    if (this.state.canMint && networkId == 137) {
       this.sendMint()
         .then(() => this.context.notify("Successful request"))
         .catch((error: any) => {
@@ -63,12 +62,16 @@ class Mint extends Component<MintProps> {
             this.context.notify(error["message"]);
         })
     } else {
-      this.context.notify("User has already minted all available NFTs");
+      if (networkId != 137) {
+        this.context.notify("Please switch to MATIC network");
+      } else {
+        this.context.notify("User has already minted all available NFTs");
+      }
     }
   }
 
   decreaseNumMint() {
-    if (this.state.numMint > 0){
+    if (this.state.numMint > 1){
       this.setState({ numMint: this.state.numMint - 1 });
     }
   }
@@ -80,7 +83,9 @@ class Mint extends Component<MintProps> {
   }
 
   render() {
-    
+    if (this.context.contract && !this.state.walletConnected) {
+      this.updateMessage();
+    }
     return (
       <Container>
         <Row>
@@ -97,6 +102,7 @@ class Mint extends Component<MintProps> {
                 className="mint-input"
                 type="number"
                 value={this.state.numMint}
+                readOnly={true}
               />
               <Button className="mint-number-button" variant="outline-secondary" onClick={()=>this.increaseNumMint()}>
                 +
@@ -117,7 +123,9 @@ class Mint extends Component<MintProps> {
             <br/>
             <br/>
             <br/>
-            <p>GMPunks is an NFT backend demo. We can help you build your real collection at <a href="https://gmlabs.wtf">https://gmlabs.wtf</a></p>
+            <p>GMPunks is an NFT backend demo. We can help you build your own collection <a href="https://gmlabs.wtf">https://gmlabs.wtf</a></p>
+            <br/>
+            <p><a href="https://github.com/GMGMGMLabs/gmpunks-frontend" target="blank"><img src="/GitHub-Mark-32px.png" alt="Github" /></a> &nbsp;&nbsp;<a href="https://opensea.io/collection/gmpunks-1" target="blank" ><img src="/Logomark-Transparent_32x.png" alt="OpenSea" /></a></p>
           </Col>
         </Row>
       </Container>

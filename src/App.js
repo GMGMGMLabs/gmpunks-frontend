@@ -3,6 +3,7 @@ import ProxyAbi from "./contracts/Proxy.abi.json";
 import getWeb3 from "./getWeb3";
 import Notification from "./components/Notification";
 import Queue from "./utils/Queue";
+import { DEFAULT_NETWORK_ID } from "./utils/Constants";
 import { AppContext } from "./components/AppContext";
 import { Container, Navbar, Button } from "react-bootstrap";
 
@@ -20,7 +21,7 @@ class App extends Component {
   }
 
   removeNotification(key) {
-    this.state.notifications.setStore(this.state.notifications._store.filter((x) => x.key != key));
+    this.state.notifications.setStore(this.state.notifications._store.filter((x) => x.key !== key));
     this.setState({
       notifications: this.state.notifications
     });
@@ -52,12 +53,12 @@ class App extends Component {
       const networkId = await web3.eth.net.getId();
       const contract = new web3.eth.Contract(
         ProxyAbi,
-        137 && "0x162FF06EE16a9f8163aF96beF1aD72EC13556839",
+        DEFAULT_NETWORK_ID && "0x95b8ad36d726B179a50853A35d4FaC97c4319625",
       );
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      if (networkId == 137) {
+      if (networkId === DEFAULT_NETWORK_ID) {
         this.setState({ web3, accounts, contract: contract });
       } else {
         this.notify("Please switch to MATIC network");
@@ -82,7 +83,7 @@ class App extends Component {
               <Navbar.Brand className="justify-content-center" href="#home"><img src="/gmpunks_sm.png" alt="Logo" className="gmpunks-logo"></img></Navbar.Brand>
               <Navbar.Text className="justify-content-end">
                 <span>
-                { this.state.accounts != null && 
+                { this.state.accounts !== null && 
                   this.getAbbreviatedAddress(this.state.accounts[0])
                 }
                 </span>

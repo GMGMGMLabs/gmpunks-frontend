@@ -1,6 +1,5 @@
 export default class Queue<T> {
     _store: T[] = [];
-    constructor(){}
     push(val: T) {
       this._store.push(val);
     }

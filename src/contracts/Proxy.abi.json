@@ -1,5 +1,10 @@
 [
 	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -209,7 +214,7 @@
 		"name": "nft",
 		"outputs": [
 			{
-				"internalType": "contract Perro55",
+				"internalType": "contract GMPunks",
 				"name": "",
 				"type": "address"
 			}
@@ -219,8 +224,27 @@
 	},
 	{
 		"inputs": [],
+		"name": "ownedBy",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "publicMint",
-		"outputs": [],
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
@@ -283,12 +307,12 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "addr",
+				"name": "to",
 				"type": "address"
 			},
 			{
 				"internalType": "bool",
-				"name": "val",
+				"name": "allow",
 				"type": "bool"
 			}
 		],

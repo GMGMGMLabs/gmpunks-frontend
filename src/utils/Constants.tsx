@@ -1,1 +1,1 @@
-export const DEFAULT_NETWORK_ID = 80001; //137;
+export const DEFAULT_NETWORK_ID = 137; //80001;

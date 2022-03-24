@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, InputGroup, Col, Container, FormControl, Row } from "react-bootstrap";
+import { Button, InputGroup, Col, Container, FormControl, Row, Alert } from "react-bootstrap";
 import { DEFAULT_NETWORK_ID } from "../utils/Constants";
 import { AppContext } from "./AppContext";
 
@@ -7,7 +7,15 @@ interface MintProps { }
 
 class Mint extends Component<MintProps> {
 
-  state = { canMint: false, numMint: 1, walletConnected: false, img: "", minted: [] };
+  state = { 
+    canMint: false, 
+    numMint: 1, 
+    walletConnected: false, 
+    img: "", 
+    minted: [],
+    minting: false,
+    successfulMint: false
+  };
 
   constructor(props: MintProps) {
     super(props);
@@ -38,6 +46,8 @@ class Mint extends Component<MintProps> {
   }
 
   figureOwners() {
+    if (this.state.minting === false)
+      this.setState({ minting: true });
     return this.context.contract.methods.ownedBy().call({
       from: this.context.accounts[0]
     }).then((owned: any) => {
@@ -47,10 +57,13 @@ class Mint extends Component<MintProps> {
           return response.json();
         }).then((data: any) => {
           let ipfsImg =  data.image.replace("ipfs://",'');
-          this.setState({ img: `https://ipfs.io/ipfs/${ipfsImg}` });
-          //console.log(data);
+          this.setState({ img: `https://ipfs.io/ipfs/${ipfsImg}`, minting: false });
         });
+      } else {
+        this.setState({ minting: false });
       }
+    }).catch((error: any) => {
+      this.setState({ minting: false });
     });
   }
 
@@ -62,24 +75,26 @@ class Mint extends Component<MintProps> {
 
   async buy() {
     let networkId = await this.context.web3.eth.net.getId();
-    console.log(networkId);
     if (this.state.canMint && networkId === DEFAULT_NETWORK_ID) {
+      this.setState({ minting: true });
       this.sendMint()
         .then((data: any) => {
           this.figureOwners();
           this.updateMessage();
           this.context.notify("Successful request");
+          this.setState({ minting: false, successfulMint: true });
         })
         .catch((error: any) => {
-          console.log(error);
+          //console.log(error);
           let parsed = false;
-            try {
-              parsed = error["message"];
-            } catch(e){}
-            if (!parsed){
-              error = JSON.parse("{" + error.toString().split('{')[1]);
-            }
-            this.context.notify(error["message"]);
+          try {
+            parsed = error["message"];
+          } catch(e){}
+          if (!parsed){
+            error = JSON.parse("{" + error.toString().split('{')[1]);
+          }
+          this.context.notify(error["message"]);
+          this.setState({ minting: false });
         })
     } else {
       if (networkId !== DEFAULT_NETWORK_ID) {
@@ -102,16 +117,35 @@ class Mint extends Component<MintProps> {
     }
   }
 
-  render() {
+  componentDidUpdate() {
     if (this.context.contract && !this.state.walletConnected) {
       this.updateMessage();
       this.figureOwners();
     }
+  }
+
+  render() {
     let img = (this.state.img !== "") ? this.state.img : "/gmpunks.gif";
-    const osLink = "https://os";
-    let links = this.state.minted.map((idx) => <p key={`link-li-${idx}`}><a href={osLink + idx}>{ osLink + idx }</a></p>);
+    const osLink = "https://opensea.io/assets/matic/0xb1fdabd22268091f6793d8dd78adb9db32c3375e/";
+    let links = this.state.minted.map((idx) => <p key={`link-li-${idx}`}><a href={osLink + idx}>{ "GMPunk " + idx }</a></p>);
     return (
       <Container>
+        <Row>
+          <Alert variant="primary">
+            <h4 style={{ marginBottom: "0rem", fontWeight: "normal"}}>
+            We can help you create your own collection: <b>hello@gmlabs.dev</b>
+            </h4>
+          </Alert>
+        </Row>
+        { this.state.successfulMint && 
+        <Row>
+          <Alert variant="info">
+            <h4 style={{ marginBottom: "0rem", fontWeight: "normal"}}>
+            Mint successful 🎉. <b>Refresh this page in 5min</b>, you can also find your Punk in <a target={"_blank"} href="https://opensea.io/collection/gmpunksv0">OpenSea</a>
+            </h4>
+          </Alert>
+        </Row>
+        }
         <Row>
           <Col>
             <img src={img} alt="question-punk" className="gmpunksgif" />
@@ -150,7 +184,9 @@ class Mint extends Component<MintProps> {
               </>
             }
             { this.state.canMint !== true && this.state.minted.length === 0 &&
-              <h4>Wallet not allowlisted, reach out to us: <a href="iglink">iglink</a></h4>
+              <h3>
+                Wallet not allowlisted, follow the instructions on <a href="https://twitter.com/gmgmgmlabs" target={"_blank"}>Twitter</a> or <a href="https://www.instagram.com/gmgmgmlabs/" target={"_blank"}>Instagram</a>
+              </h3>
             }
           </Col>
         </Row>
@@ -159,9 +195,13 @@ class Mint extends Component<MintProps> {
             <br/>
             <br/>
             <br/>
-            <p>We can help you build your own collection <a href="https://gmlabs.wtf">https://gmlabs.wtf</a></p>
             <br/>
-            <p><a href="https://github.com/GMGMGMLabs/gmpunks-frontend" target="blank"><img src="/GitHub-Mark-32px.png" alt="Github" /></a> &nbsp;&nbsp;<a href="https://opensea.io/collection/gmpunks-1" target="blank" ><img src="/Logomark-Transparent_32x.png" alt="OpenSea" /></a></p>
+            <p>
+              <a href="https://github.com/GMGMGMLabs/gmpunks-frontend" target="blank"><img src="/GitHub-Mark-32px.png" alt="Github" /></a> 
+              &nbsp;&nbsp;<a href="https://opensea.io/collection/gmpunks-1" target="blank" ><img src="/Logomark-Transparent_32x.png" alt="OpenSea" /></a>
+              &nbsp;&nbsp;<a href="https://twitter.com/gmgmgmlabs" target="blank" ><img src="/twitterx32.png" alt="Twitter" /></a>
+              &nbsp;&nbsp;<a href="https://www.instagram.com/gmgmgmlabs/" target="blank" ><img src="/instagramx32.png" alt="Instagram" /></a>
+            </p>
           </Col>
         </Row>
       </Container>

@@ -11,7 +11,7 @@ class Notification extends Component<NotificationProps> {
   render() {
     //
     return (
-        <Alert variant="light notification-alert">
+        <Alert variant="info notification-alert">
           <div className="notification-close" onClick={this.props.onClose}>x</div>
           {this.props.msg}
         </Alert>

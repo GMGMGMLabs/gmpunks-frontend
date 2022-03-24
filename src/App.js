@@ -21,7 +21,7 @@ class App extends Component {
   }
 
   removeNotification(key) {
-    this.state.notifications.setStore(this.state.notifications._store.filter((x) => x.key !== key));
+    this.state.notifications.setStore(this.state.notifications._store.filter((x) => x.key != key));
     this.setState({
       notifications: this.state.notifications
     });
@@ -43,8 +43,13 @@ class App extends Component {
 
   connectWallet = async () => {
     try {
-      // Get network provider and web3 instance.
+
+      // Get Metamask access
       const web3 = await getWeb3();
+
+      window.ethereum.on('accountsChanged', function (accounts) {
+        window.location.reload();
+      });
 
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
@@ -53,7 +58,7 @@ class App extends Component {
       const networkId = await web3.eth.net.getId();
       const contract = new web3.eth.Contract(
         ProxyAbi,
-        DEFAULT_NETWORK_ID && "0x95b8ad36d726B179a50853A35d4FaC97c4319625",
+        DEFAULT_NETWORK_ID && "0xa6e9E28CFda7366F1bD2c2B7Cb9d394A4afEc13f",
       );
 
       // Set web3, accounts, and contract to the state, and then proceed with an

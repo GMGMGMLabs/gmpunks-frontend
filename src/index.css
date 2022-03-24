@@ -109,9 +109,11 @@ input[type=number] {
   height: 50px;
 }
 
+/*
 .notification-alert {
   border: 1px solid rgb(230, 55, 119) !important;
 }
+*/
 
 .notification-bar {
   position:absolute;
@@ -119,7 +121,7 @@ input[type=number] {
   right:120px;
   z-index:1001;
   font-size: 1.2rem;
-  width: 300px;
+  width: 350px;
 }
 
 .notification-bar .notification-close {
